@@ -1,0 +1,93 @@
+<!-- Refernce:  -->
+<!-- https://kouzie.github.io/spring/Spring-Boot-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-WebSocket/#%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8-%EA%B8%B0%EB%B0%98-%EA%B0%84%EB%8B%A8%ED%95%9C-%EC%9B%B9%EC%86%8C%EC%BA%A3-%EC%98%88%EC%A0%9C -->
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="EUC-KR">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Your First WebSocket!</title>
+</head>
+<body>
+
+	<script type="text/javascript">
+	
+	    var _wsUri = "ws://localhost:8080/chat";
+	    var _websocket;
+	    var _output;
+	    
+	    function init() {
+	        _output = document.getElementById("output");
+
+	        _websocket = new WebSocket(_wsUri);
+	        _websocket.onopen = function (evt) {onOpen(evt)};
+	        _websocket.onmessage = function (evt) {onMessage(evt)};
+	        _websocket.onerror = function (evt) {onError(evt)};	        
+	    }
+	    
+	    function send_message() {
+		    var textID = document.getElementById("textID");
+	    	doSend(textID.value);	       
+	    }
+	
+	   function onOpen(evt) {
+	       writeToScreen("Connected to Endpoint!");
+	    }
+	   
+	    function onMessage(evt) {
+	    	// receive text
+	        //writeToScreen("Message Received: " + evt.data);
+	    	
+	    	// receive json
+    	    var msg = JSON.parse(event.data);
+	    	writeToScreen("Message Received: " + msg.text);
+	    }
+	    
+	    function onError(evt) {
+	        writeToScreen('ERROR: ' + evt.data);
+	    }
+	    
+	    function doSend(message) {
+	    	// send text
+	        //writeToScreen("Message Sent: " + message);
+	        //_websocket.send(message);
+	        
+	        // send json
+	        var msg = {
+	        	type : 'message',
+	        	text : message,
+	        	id: 1,
+	        	date: Date.now()
+	        };
+	        _websocket.send(JSON.stringify(msg));
+	    }
+	    
+	    function writeToScreen(message) {
+	        var pre = document.createElement("p");
+	        pre.style.wordWrap = "break-word";
+	        pre.innerHTML = message;
+	
+	        _output.appendChild(pre);
+	    }
+	    
+	    function onKeyDown() {
+	    	var keyCode = event.keyCode;
+	    	if (keyCode == 13) {// return key?
+	    		send_message();	    		
+   			}
+	    }
+	    
+	    window.addEventListener("load", init, false);
+	</script>
+	
+	
+	<h1 style="text-align: center;">Hello World WebSocket Client</h1>
+	
+	<br>
+	<div style="text-align: center;">
+        <input onclick="send_message()" value="Send" type="button">
+        <input id="textID" name="message" value="Hello WebSocket!" type="text" onkeydown="onKeyDown()"><br>
+	</div>
+	<div id="output"></div>
+
+</body>
+</html>
